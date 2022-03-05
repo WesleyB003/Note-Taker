@@ -1,28 +1,24 @@
-const router = require("express").Router();
-const {
-    notes
-} = require('../../db/note-db');
-const {
-    createNewNote,
-    removeNote
-} = require('../../lib/noteTasks');
-
-
+const router = require('express').Router();
+const { newNote, deleteNote } = require('../../lib/note-tasks');
+let { notesData } = require('../../db/notes');
+ 
 router.get('/notes', (req, res) => {
-    let saved = notes;
-    res.json(saved);
-})
+  let results = notesData;
+  res.json(results);
+});
 
 router.post('/notes', (req, res) => {
-    req.body.id = notes.length.toString();
-    let note = createNewNote(req.body, notes);
-    res.json(note);
-})
+  if(notesData){
+  req.body.id = notesData.length.toString();
+  } else 
+  {req.body.id = 0}
+  res.json(newNote(req.body, notesData));
+});
 
-router.delete('/notes/:id', (req, res) => {
-    removeNote(notes, req.params.id);
-    res.json(notes);
-})
-
+router.delete('/notes/:id', async (req, res) => {
+  const { id } = req.params
+  notesData = await deleteNote(id, notesData);
+  res.json(notesData);
+});
 
 module.exports = router;
